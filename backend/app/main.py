@@ -42,8 +42,9 @@ async def api_info():
     }
 
 @app.get("/health")
+@app.get("/api/health")
 async def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "alive": True}
 
 # Localização dos arquivos estáticos do frontend (produção unificada)
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
