@@ -1,0 +1,106 @@
+@import 'tailwindcss';
+
+@theme {
+  /* ======================================================== */
+  /* PALETA OFICIAL DO MANUAL DE IDENTIDADE (VERSÃO 2)        */
+  /* ======================================================== */
+  --color-marinho: #01203C;
+  --color-marinho-escuro: #001325;
+  --color-azul-secundario: #032F52;
+  
+  --color-laranja: #FB8B03;
+  --color-laranja-hover: #E67A00;
+  --color-laranja-escuro: #D97602;
+  --color-laranja-50: #FFF7ED;
+  --color-laranja-100: #FFEDD5;
+  --color-laranja-500: #FB8B03;
+  --color-laranja-600: #D97602;
+  
+  --color-papel: #F7F8FA;
+  --color-verde-status: #1E8E5A;
+  --color-verde-bg: #EAF7EE;
+
+  /* Aliases para manter compatibilidade com componentes existentes */
+  --color-ocean-50: #F7F8FA;
+  --color-ocean-100: #E2E8F0;
+  --color-ocean-200: #CBD5E1;
+  --color-ocean-300: #64748B;
+  --color-ocean-400: #032F52;
+  --color-ocean-500: #01203C;
+  --color-ocean-600: #01203C;
+  --color-ocean-700: #01203C;
+  --color-ocean-800: #00182E;
+  --color-ocean-900: #000F1E;
+  
+  --color-cta-400: #FB8B03;
+  --color-cta-500: #FB8B03;
+  --color-cta-600: #D97602;
+
+  --font-heading: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: #F7F8FA;
+  color: #01203C;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+}
+
+/* ======================================================== */
+/* ACESSIBILIDADE VISUAL (BAIXA VISÃO / LETRAS GRANDES E NEGRITO) */
+/* ======================================================== */
+
+/* Transição suave ao alternar tamanho */
+html {
+  transition: font-size 0.2s ease-in-out;
+}
+
+/* Tamanho Normal (Padrão) */
+html[data-text-size="normal"] {
+  font-size: 16px;
+}
+
+/* Tamanho Grande (+15% de ampliação) */
+html[data-text-size="grande"] {
+  font-size: 18px;
+}
+
+/* Tamanho Extra Grande (+25% de ampliação) */
+html[data-text-size="extragrande"] {
+  font-size: 20px;
+}
+
+/* Modo Negrito Acessível para Pessoas com Baixa Visão / Astigmatismo */
+html[data-text-bold="true"] body,
+html[data-text-bold="true"] p,
+html[data-text-bold="true"] span:not(.font-black):not(.font-bold),
+html[data-text-bold="true"] a,
+html[data-text-bold="true"] button,
+html[data-text-bold="true"] input,
+html[data-text-bold="true"] label,
+html[data-text-bold="true"] td,
+html[data-text-bold="true"] th,
+html[data-text-bold="true"] li {
+  font-weight: 600 !important;
+  letter-spacing: 0.015em;
+}
+
+html[data-text-bold="true"] h1,
+html[data-text-bold="true"] h2,
+html[data-text-bold="true"] h3,
+html[data-text-bold="true"] h4,
+html[data-text-bold="true"] h5,
+html[data-text-bold="true"] h6 {
+  font-weight: 900 !important;
+}
+
+/* Aumento de contraste sutil para bordas no modo negrito acessível */
+html[data-text-bold="true"] .border-slate-200,
+html[data-text-bold="true"] .border-slate-100 {
+  border-color: #cbd5e1 !important;
+}

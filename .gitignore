@@ -1,0 +1,24 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+env/
+.env
+.venv
+venv/
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Local tools & large binaries
+cloudflared.exe
+tools/
+*.zip
+download_git.ps1
+
+# OS files
+.DS_Store
+Thumbs.db

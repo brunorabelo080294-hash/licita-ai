@@ -1,0 +1,212 @@
+[
+  {
+    "nome": "Leopoldina",
+    "uf": "MG",
+    "latitude": -21.5316,
+    "longitude": -42.6428,
+    "codigo_ibge": "3138402"
+  },
+  {
+    "nome": "Cataguases",
+    "uf": "MG",
+    "latitude": -21.3891,
+    "longitude": -42.6976,
+    "codigo_ibge": "3115301"
+  },
+  {
+    "nome": "Ubá",
+    "uf": "MG",
+    "latitude": -21.1203,
+    "longitude": -42.9428,
+    "codigo_ibge": "3169901"
+  },
+  {
+    "nome": "Além Paraíba",
+    "uf": "MG",
+    "latitude": -21.8798,
+    "longitude": -42.7175,
+    "codigo_ibge": "3101509"
+  },
+  {
+    "nome": "Juiz de Fora",
+    "uf": "MG",
+    "latitude": -21.7642,
+    "longitude": -43.3503,
+    "codigo_ibge": "3136703"
+  },
+  {
+    "nome": "Muriaé",
+    "uf": "MG",
+    "latitude": -21.1306,
+    "longitude": -42.3664,
+    "codigo_ibge": "3143906"
+  },
+  {
+    "nome": "Santos Dumont",
+    "uf": "MG",
+    "latitude": -21.4617,
+    "longitude": -43.5519,
+    "codigo_ibge": "3160702"
+  },
+  {
+    "nome": "Viçosa",
+    "uf": "MG",
+    "latitude": -20.7546,
+    "longitude": -42.8825,
+    "codigo_ibge": "3171303"
+  },
+  {
+    "nome": "Manhuaçu",
+    "uf": "MG",
+    "latitude": -20.2572,
+    "longitude": -42.0286,
+    "codigo_ibge": "3139400"
+  },
+  {
+    "nome": "Rio Pomba",
+    "uf": "MG",
+    "latitude": -21.2739,
+    "longitude": -43.1714,
+    "codigo_ibge": "3155801"
+  },
+  {
+    "nome": "Nova Friburgo",
+    "uf": "RJ",
+    "latitude": -22.2819,
+    "longitude": -42.5311,
+    "codigo_ibge": "3303401"
+  },
+  {
+    "nome": "Teresópolis",
+    "uf": "RJ",
+    "latitude": -22.4122,
+    "longitude": -42.9858,
+    "codigo_ibge": "3305802"
+  },
+  {
+    "nome": "Carmo",
+    "uf": "RJ",
+    "latitude": -21.9328,
+    "longitude": -42.6061,
+    "codigo_ibge": "3301207"
+  },
+  {
+    "nome": "Sapucaia",
+    "uf": "RJ",
+    "latitude": -21.9964,
+    "longitude": -42.9128,
+    "codigo_ibge": "3305406"
+  },
+  {
+    "nome": "Três Rios",
+    "uf": "RJ",
+    "latitude": -22.1167,
+    "longitude": -43.2092,
+    "codigo_ibge": "3306008"
+  },
+  {
+    "nome": "Petrópolis",
+    "uf": "RJ",
+    "latitude": -22.5046,
+    "longitude": -43.1785,
+    "codigo_ibge": "3303906"
+  },
+  {
+    "nome": "Cantagalo",
+    "uf": "RJ",
+    "latitude": -21.9808,
+    "longitude": -42.3678,
+    "codigo_ibge": "3301108"
+  },
+  {
+    "nome": "Cordeiro",
+    "uf": "RJ",
+    "latitude": -22.0278,
+    "longitude": -42.3611,
+    "codigo_ibge": "3301504"
+  },
+  {
+    "nome": "Bom Jardim",
+    "uf": "RJ",
+    "latitude": -22.1544,
+    "longitude": -42.4178,
+    "codigo_ibge": "3300506"
+  },
+  {
+    "nome": "Sumidouro",
+    "uf": "RJ",
+    "latitude": -22.0489,
+    "longitude": -42.6753,
+    "codigo_ibge": "3305703"
+  },
+  {
+    "nome": "Santa Maria Madalena",
+    "uf": "RJ",
+    "latitude": -21.9547,
+    "longitude": -42.0089,
+    "codigo_ibge": "3304607"
+  },
+  {
+    "nome": "Trajano de Moraes",
+    "uf": "RJ",
+    "latitude": -22.0633,
+    "longitude": -42.0647,
+    "codigo_ibge": "3305901"
+  },
+  {
+    "nome": "Macuco",
+    "uf": "RJ",
+    "latitude": -21.9839,
+    "longitude": -42.2536,
+    "codigo_ibge": "3302452"
+  },
+  {
+    "nome": "São Sebastião do Alto",
+    "uf": "RJ",
+    "latitude": -21.9581,
+    "longitude": -42.1333,
+    "codigo_ibge": "3305307"
+  },
+  {
+    "nome": "Itaocara",
+    "uf": "RJ",
+    "latitude": -21.6744,
+    "longitude": -42.0783,
+    "codigo_ibge": "3302106"
+  },
+  {
+    "nome": "Casimiro de Abreu",
+    "uf": "RJ",
+    "latitude": -22.48,
+    "longitude": -42.2044,
+    "codigo_ibge": "3301306"
+  },
+  {
+    "nome": "Bom Jesus do Itabapoana",
+    "uf": "RJ",
+    "latitude": -21.1342,
+    "longitude": -41.6797,
+    "codigo_ibge": "3300605"
+  },
+  {
+    "nome": "Silva Jardim",
+    "uf": "RJ",
+    "latitude": -22.6508,
+    "longitude": -42.3928,
+    "codigo_ibge": "3305604"
+  },
+  {
+    "nome": "São Pedro da Aldeia",
+    "uf": "RJ",
+    "latitude": -22.8408,
+    "longitude": -42.1028,
+    "codigo_ibge": "3305208"
+  },
+  {
+    "nome": "Itaguaí",
+    "uf": "RJ",
+    "latitude": -22.8622,
+    "longitude": -43.7758,
+    "codigo_ibge": "3302007"
+  }
+]

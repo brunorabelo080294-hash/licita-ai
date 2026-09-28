@@ -1,0 +1,26 @@
+{
+  "name": "Licita Aí — Simplificando Licitações",
+  "short_name": "Licita Aí",
+  "description": "Seu copiloto inteligente e radar geolocalizado de licitações públicas municipais e estaduais com dados oficiais do PNCP.",
+  "start_url": "/feed",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#01203C",
+  "theme_color": "#01203C",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"]
+}
