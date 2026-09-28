@@ -57,14 +57,23 @@ export function ModalGerenciarEmpresas({ isOpen, onClose }: ModalGerenciarEmpres
     onClose();
   };
 
-  const handleRemover = (e: React.MouseEvent, cnpj: string) => {
+  const handleRemover = (e: React.MouseEvent, emp: Empresa) => {
     e.stopPropagation();
     if (empresas.length <= 1) {
-      alert('Você precisa manter ao menos um CNPJ cadastrado.');
+      alert('Você precisa manter ao menos um CNPJ cadastrado. Para remover esta empresa, cadastre uma nova primeiro.');
       return;
     }
-    if (confirm('Deseja realmente remover esta empresa da sua conta?')) {
-      removerEmpresa(cnpj);
+    const isActive = emp.cnpj.replace(/\D/g, '') === empresaAtiva.cnpj.replace(/\D/g, '');
+    const outra = empresas.find(item => item.cnpj.replace(/\D/g, '') !== emp.cnpj.replace(/\D/g, ''));
+    const nomeEmp = emp.nomeFantasia || emp.razaoSocial;
+    const nomeOutra = outra ? (outra.nomeFantasia || outra.razaoSocial) : 'outra cadastrada';
+
+    const msg = isActive
+      ? `Deseja realmente remover a empresa "${nomeEmp}"?\n\nComo ela está em uso no momento, a empresa "${nomeOutra}" será ativada automaticamente.`
+      : `Deseja realmente remover a empresa "${nomeEmp}" da sua conta?`;
+
+    if (window.confirm(msg)) {
+      removerEmpresa(emp.cnpj);
       carregarDados();
     }
   };
@@ -349,29 +358,44 @@ export function ModalGerenciarEmpresas({ isOpen, onClose }: ModalGerenciarEmpres
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 shrink-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {isActive ? (
-                          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                            <CheckCircle2 size={20} />
+                          <div className="flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-xl text-xs font-bold shadow-2xs">
+                            <CheckCircle2 size={14} className="text-emerald-600" />
+                            <span>Em Uso</span>
                           </div>
                         ) : (
                           <button
                             type="button"
                             onClick={() => handleSelectEmpresa(emp.cnpj)}
-                            className="px-3 py-1.5 bg-ocean-600 hover:bg-ocean-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1"
+                            className="px-3 py-1.5 bg-[#01203C] hover:bg-[#032F52] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer active:scale-95"
                           >
                             <span>Ativar</span>
                             <ChevronRight size={13} />
                           </button>
                         )}
-                        {empresas.length > 1 && !isActive && (
+
+                        {/* Botão de Excluir SEMPRE visível quando há mais de 1 empresa */}
+                        {empresas.length > 1 ? (
                           <button
                             type="button"
-                            onClick={(e) => handleRemover(e, emp.cnpj)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-1"
-                            title="Remover esta empresa"
+                            onClick={(e) => handleRemover(e, emp)}
+                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-1 cursor-pointer active:scale-90"
+                            title={`Remover ${emp.nomeFantasia || emp.razaoSocial}`}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              alert('Você precisa manter ao menos um CNPJ cadastrado. Para remover esta empresa, cadastre uma nova primeiro.');
+                            }}
+                            className="p-1.5 text-slate-200 hover:text-slate-400 rounded-lg transition-colors ml-1 cursor-not-allowed"
+                            title="Único CNPJ ativo. Cadastre outro antes de remover."
+                          >
+                            <Trash2 size={16} />
                           </button>
                         )}
                       </div>

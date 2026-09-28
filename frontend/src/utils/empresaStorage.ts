@@ -169,13 +169,7 @@ export function getListaEmpresas(): Empresa[] {
     if (raw) {
       const lista: Empresa[] = JSON.parse(raw);
       if (Array.isArray(lista) && lista.length > 0) {
-        // Assegura que todas tenham coordenadas e categorias válidas
-        const temMadalena = lista.some(e => e.cnpj === EMPRESA_MADALENA.cnpj);
-        const temGaucha = lista.some(e => e.cnpj === EMPRESA_GAUCHA.cnpj);
-        let atualizada = temMadalena ? lista : [...lista, EMPRESA_MADALENA];
-        if (!temGaucha) atualizada = [...atualizada, EMPRESA_GAUCHA];
-
-        return atualizada.map(emp => {
+        return lista.map(emp => {
           if (!emp.categoriaNome || !emp.categoriaPrincipal) {
             const info = identificarCategoriaCnae(emp.cnaePrincipal || '', emp.cnaeDescricao || '');
             emp.categoriaPrincipal = info.categoria;
