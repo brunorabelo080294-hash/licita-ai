@@ -78,6 +78,7 @@ export default function App() {
           <Route path="/calculadora" element={<CalculadoraMargem />} />
           <Route path="/cofre" element={<CofreDigital />} />
           <Route path="/sos-ia" element={<SosIA />} />
+          <Route path="/edital" element={<DetalheEdital />} />
           <Route path="/edital/*" element={<DetalheEdital />} />
           <Route path="/edital/:id" element={<DetalheEdital />} />
         </Route>

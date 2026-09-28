@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Columns3, Sparkles, Plus, RefreshCw, ChevronRight, ChevronDown, 
+  Columns3, Sparkles, Plus, RefreshCw, ChevronRight, ChevronDown, ChevronUp,
   MapPin, Calendar, Building2, ExternalLink, Trash2, CheckCircle2, 
   FileText, ShieldCheck, AlertCircle, ArrowRight, Eye, MoveRight,
-  BookOpen, HelpCircle, X, Search, CheckSquare, Square, Flame, Trophy, Award, Sliders
+  BookOpen, HelpCircle, X, Search, CheckSquare, Square, Flame, Trophy, Award, Sliders,
+  GripVertical, Maximize2, Clock
 } from 'lucide-react';
 import { getEmpresaAtiva, getListaEmpresas, Empresa } from '../utils/empresaStorage';
 import { 
@@ -12,7 +13,8 @@ import {
   atualizarObservacaoKanban, removerDoKanban, adicionarAoKanban,
   inicializarKanbanComSementes, ETAPAS_CONFIG 
 } from '../utils/kanbanStorage';
-import { ItemKanban, KanbanEtapa, Oportunidade } from '../types';
+import { getListaCNDs } from '../utils/cndStorage';
+import { ItemKanban, KanbanEtapa, Oportunidade, StatusCND } from '../types';
 import { BrasaoPrefeitura } from '../components/shared/BrasaoPrefeitura';
 import { calcularStatusPrazo, formatarUrlPncpWeb, resolverUrlOrigem } from '../utils/pncpUrls';
 import { ModalGerenciarEmpresas } from '../components/shared/ModalGerenciarEmpresas';
@@ -39,6 +41,9 @@ export function KanbanOportunidades() {
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<KanbanEtapa | null>(null);
   const [filtroTexto, setFiltroTexto] = useState('');
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  const [selectedAnaliseOp, setSelectedAnaliseOp] = useState<Oportunidade | null>(null);
+  const [cndsEmpresa, setCndsEmpresa] = useState<StatusCND[]>(getListaCNDs());
 
   const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -48,6 +53,7 @@ export function KanbanOportunidades() {
     setEmpresa(ativa);
     const dados = getItensKanban(ativa.cnpj);
     setItens(dados);
+    setCndsEmpresa(getListaCNDs());
   };
 
   useEffect(() => {
@@ -354,17 +360,31 @@ export function KanbanOportunidades() {
                       const statusInfo = calcularStatusPrazo(op.dataEncerramento, op.dataAbertura);
                       const portalOrigem = resolverUrlOrigem(op);
                       const isDisputa = coluna.id === 'disputa';
+                      const isExpanded = expandedCardId === item.id;
 
                       return (
                         <div
                           key={item.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, item.id)}
-                          className={`bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing relative group ${coluna.bordaCard}`}
+                          className={`bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-xs hover:shadow-md transition-all relative group ${coluna.bordaCard} ${
+                            isExpanded ? 'ring-2 ring-[#01203C]/10 border-[#01203C]/30' : ''
+                          }`}
                         >
-                          {/* Topo do Card: Órgão & Brasão */}
+                          {/* Topo do Card: Alça de Arraste, Órgão & Brasão */}
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <div className="flex items-center space-x-2 min-w-0">
+                              {/* Alça de Arraste (Grip) dedicada — apenas ela inicia o drag nativo, liberando 100% dos cliques no card */}
+                              <div
+                                draggable
+                                onDragStart={(e) => {
+                                  e.dataTransfer.setData('text/plain', item.id);
+                                  setDraggedItemId(item.id);
+                                }}
+                                className="cursor-grab active:cursor-grabbing p-1 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-md shrink-0 transition-colors select-none"
+                                title="Segure e arraste para mover este card entre as colunas do funil"
+                              >
+                                <GripVertical size={14} />
+                              </div>
+
                               <BrasaoPrefeitura municipio={op.municipio} size="sm" />
                               <div className="min-w-0">
                                 <p className="text-[11px] font-bold text-slate-700 truncate leading-tight" title={op.orgao}>
@@ -383,25 +403,22 @@ export function KanbanOportunidades() {
                             </span>
                           </div>
 
-                          {/* Objeto do Certame */}
+                          {/* Objeto do Certame - Clicável para abrir mais informações */}
                           <h4 
-                            data-no-drag="true"
-                            draggable={false}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onTouchStart={(e) => e.stopPropagation()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/edital/${encodeURIComponent(op.id)}`, { state: { oportunidade: op } });
-                            }}
+                            onClick={() => setExpandedCardId(prev => prev === item.id ? null : item.id)}
                             className="text-xs font-bold text-[#01203C] hover:text-[#FB8B03] transition-colors line-clamp-2 leading-snug cursor-pointer mb-2"
-                            title={op.objetoOriginal || op.objetoResumido}
+                            title="Clique para ver mais informações deste certame"
                             style={{ fontFamily: "'Montserrat', sans-serif" }}
                           >
                             {op.objetoResumido || op.objetoOriginal}
                           </h4>
 
                           {/* Valor Estimado & Datas */}
-                          <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 mb-2 flex items-center justify-between text-xs">
+                          <div 
+                            onClick={() => setExpandedCardId(prev => prev === item.id ? null : item.id)}
+                            className="bg-slate-50 hover:bg-slate-100/70 cursor-pointer p-2 rounded-xl border border-slate-100 mb-2 flex items-center justify-between text-xs transition-colors"
+                            title="Clique para expandir informações"
+                          >
                             <div>
                               <span className="text-[9px] text-slate-400 block font-bold uppercase">Valor Teto</span>
                               <span className="font-black text-[#01203C]">
@@ -440,13 +457,9 @@ export function KanbanOportunidades() {
                           </div>
 
                           {/* Campo de Anotação Rápida */}
-                          <div className="mb-3">
+                          <div className="mb-2.5">
                             <input
                               type="text"
-                              data-no-drag="true"
-                              draggable={false}
-                              onMouseDown={(e) => e.stopPropagation()}
-                              onTouchStart={(e) => e.stopPropagation()}
                               placeholder="Adicionar observação..."
                               defaultValue={item.observacao || ''}
                               onBlur={(e) => handleAtualizarObs(item.id, e.target.value)}
@@ -454,23 +467,71 @@ export function KanbanOportunidades() {
                             />
                           </div>
 
+                          {/* ======================================================== */}
+                          {/* CAMPO DE MAIS INFORMAÇÕES (EXPANSÍVEL NO CARD)           */}
+                          {/* ======================================================== */}
+                          {isExpanded && (
+                            <div className="mb-3 pt-2.5 border-t border-slate-200/80 space-y-2.5 animate-in fade-in duration-150">
+                              <div className="bg-[#F8FAFC] p-2.5 rounded-xl border border-slate-200/70 text-xs">
+                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider block mb-1 flex items-center gap-1">
+                                  <FileText size={12} className="text-[#FB8B03]" />
+                                  Objeto Completo
+                                </span>
+                                <p className="text-[11px] text-slate-700 leading-relaxed font-normal whitespace-pre-line max-h-40 overflow-y-auto">
+                                  {op.objetoOriginal || op.objetoResumido}
+                                </p>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                  <span className="text-slate-400 font-bold uppercase block">Portal</span>
+                                  <span className="font-bold text-[#01203C] truncate block">
+                                    {op.portalNomeCurto || op.portalNome || portalOrigem.nome}
+                                  </span>
+                                </div>
+                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                  <span className="text-slate-400 font-bold uppercase block">Prazo</span>
+                                  <span className="font-bold text-[#01203C] truncate block">
+                                    {statusInfo.textoPrazo}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {portalOrigem.url && (
+                                <a
+                                  href={portalOrigem.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full py-1 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded-lg flex items-center justify-center gap-1 transition-all"
+                                >
+                                  <ExternalLink size={11} />
+                                  <span>Abrir Edital no Portal Oficial</span>
+                                </a>
+                              )}
+                            </div>
+                          )}
+
                           {/* Ações no Rodapé do Card */}
                           <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-slate-100">
-                            {/* Botão Principal: Ver Análise */}
+                            {/* Botão Principal: Ver Análise (Abre Modal de Análise Instantâneo) */}
                             <button
                               type="button"
-                              data-no-drag="true"
-                              draggable={false}
-                              onMouseDown={(e) => e.stopPropagation()}
-                              onTouchStart={(e) => e.stopPropagation()}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/edital/${encodeURIComponent(op.id)}`, { state: { oportunidade: op } });
-                              }}
+                              onClick={() => setSelectedAnaliseOp(op)}
                               className="flex-1 py-1.5 px-2 bg-[#00A67E] hover:bg-[#008F6B] text-white text-[11px] font-black rounded-lg transition-all shadow-2xs flex items-center justify-center gap-1 cursor-pointer active:scale-95"
+                              title="Abrir Análise Inteligente e Detalhes Deste Edital"
                             >
                               <Sparkles size={11} />
                               <span>VER ANÁLISE</span>
+                            </button>
+
+                            {/* Botão de Expandir / Recolher Informações */}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedCardId(prev => prev === item.id ? null : item.id)}
+                              className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[10px] font-bold transition-all cursor-pointer"
+                              title={isExpanded ? 'Recolher informações' : 'Expandir mais informações'}
+                            >
+                              {isExpanded ? <ChevronUp size={13} className="text-[#FB8B03]" /> : <ChevronDown size={13} />}
                             </button>
 
                             {/* Se estiver em Disputa, Botão de Sala de Lances do Portal */}
@@ -479,10 +540,6 @@ export function KanbanOportunidades() {
                                 href={portalOrigem.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                data-no-drag="true"
-                                draggable={false}
-                                onMouseDown={(e) => e.stopPropagation()}
-                                onTouchStart={(e) => e.stopPropagation()}
                                 className="p-1.5 bg-[#FB8B03] hover:bg-[#D97602] text-white rounded-lg transition-all shadow-2xs"
                                 title={`Abrir Sala de Disputa em ${portalOrigem.nome}`}
                               >
@@ -493,10 +550,6 @@ export function KanbanOportunidades() {
                             {/* Seletor Rápido de Transferência de Etapa */}
                             <div className="relative">
                               <select
-                                data-no-drag="true"
-                                draggable={false}
-                                onMouseDown={(e) => e.stopPropagation()}
-                                onTouchStart={(e) => e.stopPropagation()}
                                 value={item.etapa}
                                 onChange={(e) => handleMoverEtapa(item.id, e.target.value as KanbanEtapa)}
                                 className="text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg px-2 py-1.5 outline-none cursor-pointer"
@@ -511,10 +564,6 @@ export function KanbanOportunidades() {
                             {/* Excluir do Kanban */}
                             <button
                               type="button"
-                              data-no-drag="true"
-                              draggable={false}
-                              onMouseDown={(e) => e.stopPropagation()}
-                              onTouchStart={(e) => e.stopPropagation()}
                               onClick={(e) => handleRemover(item.id, e)}
                               className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
                               title="Remover deste quadro"
@@ -803,6 +852,185 @@ export function KanbanOportunidades() {
               >
                 Entendido, Fechar Guia
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL DE ANÁLISE DA LICITAÇÃO (INSTANTÂNEO NO KANBAN)     */}
+      {/* ======================================================== */}
+      {selectedAnaliseOp && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5"
+          onClick={() => setSelectedAnaliseOp(null)}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-200"
+          >
+            {/* Topo do Modal */}
+            <div className="bg-[#01203C] text-white p-5 flex items-start justify-between relative">
+              <div className="flex items-center space-x-3 min-w-0 pr-8">
+                <BrasaoPrefeitura municipio={selectedAnaliseOp.municipio} size="md" />
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-white/20 text-white border border-white/20">
+                      {selectedAnaliseOp.modalidade}
+                    </span>
+                    <span 
+                      className="text-[10px] font-bold px-2 py-0.5 rounded border"
+                      style={{
+                        backgroundColor: selectedAnaliseOp.portalBgCor || 'rgba(255,255,255,0.15)',
+                        color: selectedAnaliseOp.portalCor || '#ffffff',
+                        borderColor: selectedAnaliseOp.portalBordaCor || 'rgba(255,255,255,0.3)'
+                      }}
+                    >
+                      {selectedAnaliseOp.portalNomeCurto || selectedAnaliseOp.portalNome || 'Portal Oficial'}
+                    </span>
+                    {selectedAnaliseOp.distanciaKm !== undefined && (
+                      <span className="text-[10px] font-semibold text-slate-300">
+                        {selectedAnaliseOp.distanciaKm <= 0.5 ? 'Sua Cidade' : `${selectedAnaliseOp.distanciaKm} km de distância`}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-base font-black text-white truncate leading-snug" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                    {selectedAnaliseOp.numeroEdital || selectedAnaliseOp.orgao}
+                  </h3>
+                  <p className="text-xs text-slate-300 truncate">
+                    {selectedAnaliseOp.orgao} • {selectedAnaliseOp.municipio?.nome}/{selectedAnaliseOp.municipio?.uf}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedAnaliseOp(null)}
+                className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all cursor-pointer absolute top-4 right-4"
+                title="Fechar análise"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Corpo do Modal */}
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+              {/* Barra de Valores & Prazo */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-[#F0FDF4] p-3.5 rounded-2xl border border-[#BBF7D0]">
+                  <span className="text-[10px] font-black text-emerald-800 uppercase tracking-wider block mb-0.5">
+                    Valor Teto Estimado
+                  </span>
+                  <span className="text-2xl font-black text-[#01203C]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                    {formatter.format(selectedAnaliseOp.valorMaximo)}
+                  </span>
+                  <span className="block text-[11px] font-medium text-emerald-700 mt-0.5">
+                    {selectedAnaliseOp.exclusivoMpe ? '🛡️ Exclusivo MPE/MEI (LC 123/06)' : 'Ampla Concorrência'}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-0.5">
+                    Status do Prazo
+                  </span>
+                  {(() => {
+                    const st = calcularStatusPrazo(selectedAnaliseOp.dataEncerramento, selectedAnaliseOp.dataAbertura);
+                    return (
+                      <div>
+                        <span className={`inline-block text-xs font-extrabold px-2 py-0.5 rounded border mb-1 ${st.badgeColor}`}>
+                          {st.badgeLabel}
+                        </span>
+                        <p className="text-xs text-slate-700 font-semibold">{st.textoPrazo}</p>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Descrição Completa do Objeto */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+                <h4 className="text-xs font-extrabold text-[#01203C] uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText size={15} className="text-[#FB8B03]" />
+                  Descrição do Objeto & Termo de Referência
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-3 rounded-xl border border-slate-100 max-h-56 overflow-y-auto">
+                  {selectedAnaliseOp.objetoOriginal || selectedAnaliseOp.objetoResumido}
+                </p>
+              </div>
+
+              {/* Checklist de Documentos no Cofre Digital */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+                <h4 className="text-xs font-extrabold text-[#01203C] uppercase tracking-wider flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <ShieldCheck size={15} className="text-[#00A67E]" />
+                    Saúde Fiscal da Empresa ({empresa.nomeFantasia || empresa.razaoSocial})
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-400">
+                    Cofre Digital
+                  </span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {cndsEmpresa.slice(0, 4).map(cnd => (
+                    <div key={cnd.id || cnd.tipo} className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
+                      <div className="flex items-center gap-2 truncate">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${
+                          cnd.status === 'valido' ? 'bg-[#00A67E]' : cnd.status === 'vencendo' ? 'bg-amber-500' : 'bg-red-500'
+                        }`} />
+                        <span className="font-semibold text-slate-700 truncate text-[11px]">{cnd.nome}</span>
+                      </div>
+                      <span className={`text-[10px] font-bold shrink-0 ml-1 ${
+                        cnd.status === 'valido' ? 'text-[#00A67E]' : cnd.status === 'vencendo' ? 'text-amber-600' : 'text-red-600'
+                      }`}>
+                        {cnd.status === 'valido' ? 'Regular' : cnd.status === 'vencendo' ? `Vence em ${cnd.diasRestantes}d` : 'Vencida'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Rodapé com Ações */}
+            <div className="bg-slate-50 p-4 sm:p-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedAnaliseOp(null)}
+                className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-all cursor-pointer"
+              >
+                Fechar
+              </button>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                {/* Botão Acessar Portal Oficial */}
+                {(() => {
+                  const portUrl = resolverUrlOrigem(selectedAnaliseOp);
+                  return (
+                    <a
+                      href={portUrl.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 sm:flex-none px-4 py-2.5 bg-white hover:bg-slate-100 border border-slate-200 text-[#01203C] rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <span>Acessar no Portal ({selectedAnaliseOp.portalNomeCurto || selectedAnaliseOp.portalNome || portUrl.nome})</span>
+                      <ExternalLink size={13} className="text-slate-400" />
+                    </a>
+                  );
+                })()}
+
+                {/* Botão Abrir Estudo Completo & Proposta (Tela Cheia) */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const idParaNav = selectedAnaliseOp.id;
+                    const opObj = selectedAnaliseOp;
+                    setSelectedAnaliseOp(null);
+                    navigate(`/edital/${encodeURIComponent(idParaNav)}`, { state: { oportunidade: opObj } });
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-[#01203C] hover:bg-[#032F52] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Maximize2 size={13} />
+                  <span>Estudo Completo & Proposta</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

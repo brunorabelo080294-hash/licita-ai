@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { mockOportunidades } from '../data/mockData';
 import { 
   ChevronLeft, FileText, AlertTriangle, CheckCircle, Clock, 
@@ -19,11 +19,13 @@ import { Oportunidade, KanbanEtapa } from '../types';
 
 export function DetalheEdital() {
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Suporte a IDs com barras (como os do PNCP: 17733643000147-1-000079/2026)
-  const rawId = params['*'] || params.id || '';
+  // Suporte a IDs com barras (como os do PNCP: 17733643000147-1-000079/2026) e query string ?id=
+  const queryId = searchParams.get('id');
+  const rawId = queryId || params['*'] || params.id || '';
   const decodedId = decodeURIComponent(rawId);
 
   // Procura oportunidade recebida via state (instantâneo), ou no Kanban do usuário, ou nos mocks

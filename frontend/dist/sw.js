@@ -1,5 +1,5 @@
 // Service Worker para suporte PWA offline e instalação mobile do Licita Aí
-const CACHE_NAME = 'licita-ai-v1';
+const CACHE_NAME = 'licita-ai-v2';
 const STATIC_ASSETS = [
   '/',
   '/feed',
