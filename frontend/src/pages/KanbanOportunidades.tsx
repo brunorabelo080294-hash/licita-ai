@@ -117,6 +117,11 @@ export function KanbanOportunidades() {
 
   // Drag and drop handlers
   const handleDragStart = (e: React.DragEvent, id: string) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('button, input, select, a, textarea, [data-no-drag]')) {
+      e.preventDefault();
+      return;
+    }
     e.dataTransfer.setData('text/plain', id);
     setDraggedItemId(id);
   };
@@ -380,7 +385,14 @@ export function KanbanOportunidades() {
 
                           {/* Objeto do Certame */}
                           <h4 
-                            onClick={() => navigate(`/edital/${encodeURIComponent(op.id)}`)}
+                            data-no-drag="true"
+                            draggable={false}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/edital/${encodeURIComponent(op.id)}`, { state: { oportunidade: op } });
+                            }}
                             className="text-xs font-bold text-[#01203C] hover:text-[#FB8B03] transition-colors line-clamp-2 leading-snug cursor-pointer mb-2"
                             title={op.objetoOriginal || op.objetoResumido}
                             style={{ fontFamily: "'Montserrat', sans-serif" }}
@@ -431,6 +443,10 @@ export function KanbanOportunidades() {
                           <div className="mb-3">
                             <input
                               type="text"
+                              data-no-drag="true"
+                              draggable={false}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onTouchStart={(e) => e.stopPropagation()}
                               placeholder="Adicionar observação..."
                               defaultValue={item.observacao || ''}
                               onBlur={(e) => handleAtualizarObs(item.id, e.target.value)}
@@ -443,7 +459,14 @@ export function KanbanOportunidades() {
                             {/* Botão Principal: Ver Análise */}
                             <button
                               type="button"
-                              onClick={() => navigate(`/edital/${encodeURIComponent(op.id)}`)}
+                              data-no-drag="true"
+                              draggable={false}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onTouchStart={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/edital/${encodeURIComponent(op.id)}`, { state: { oportunidade: op } });
+                              }}
                               className="flex-1 py-1.5 px-2 bg-[#00A67E] hover:bg-[#008F6B] text-white text-[11px] font-black rounded-lg transition-all shadow-2xs flex items-center justify-center gap-1 cursor-pointer active:scale-95"
                             >
                               <Sparkles size={11} />
@@ -456,6 +479,10 @@ export function KanbanOportunidades() {
                                 href={portalOrigem.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                data-no-drag="true"
+                                draggable={false}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onTouchStart={(e) => e.stopPropagation()}
                                 className="p-1.5 bg-[#FB8B03] hover:bg-[#D97602] text-white rounded-lg transition-all shadow-2xs"
                                 title={`Abrir Sala de Disputa em ${portalOrigem.nome}`}
                               >
@@ -466,6 +493,10 @@ export function KanbanOportunidades() {
                             {/* Seletor Rápido de Transferência de Etapa */}
                             <div className="relative">
                               <select
+                                data-no-drag="true"
+                                draggable={false}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onTouchStart={(e) => e.stopPropagation()}
                                 value={item.etapa}
                                 onChange={(e) => handleMoverEtapa(item.id, e.target.value as KanbanEtapa)}
                                 className="text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg px-2 py-1.5 outline-none cursor-pointer"
@@ -480,6 +511,10 @@ export function KanbanOportunidades() {
                             {/* Excluir do Kanban */}
                             <button
                               type="button"
+                              data-no-drag="true"
+                              draggable={false}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onTouchStart={(e) => e.stopPropagation()}
                               onClick={(e) => handleRemover(item.id, e)}
                               className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all cursor-pointer"
                               title="Remover deste quadro"

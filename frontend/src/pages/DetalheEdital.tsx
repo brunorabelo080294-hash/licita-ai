@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { mockOportunidades } from '../data/mockData';
 import { 
   ChevronLeft, FileText, AlertTriangle, CheckCircle, Clock, 
@@ -13,20 +13,40 @@ import { CalculadoraViabilidadeCard } from '../components/shared/CalculadoraViab
 import { getEmpresaAtiva, Empresa } from '../utils/empresaStorage';
 import { formatarUrlPncpWeb, resolverUrlOrigem, calcularStatusPrazo } from '../utils/pncpUrls';
 import { isOportunidadeFavorita, toggleFavoritoOportunidade } from '../utils/favoritosStorage';
-import { getEtapaOportunidade, adicionarAoKanban, ETAPAS_CONFIG } from '../utils/kanbanStorage';
+import { getEtapaOportunidade, adicionarAoKanban, getItensKanban, ETAPAS_CONFIG } from '../utils/kanbanStorage';
 import axios from 'axios';
 import { Oportunidade, KanbanEtapa } from '../types';
 
 export function DetalheEdital() {
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Suporte a IDs com barras (como os do PNCP: 17733643000147-1-000079/2026)
   const rawId = params['*'] || params.id || '';
   const decodedId = decodeURIComponent(rawId);
 
-  // Procura oportunidade localmente ou busca do backend
-  const localMatch = mockOportunidades.find(op => 
+  // Procura oportunidade recebida via state (instantâneo), ou no Kanban do usuário, ou nos mocks
+  const opFromState = (location.state as any)?.oportunidade;
+  const kanbanMatch = (() => {
+    try {
+      const itens = getItensKanban(getEmpresaAtiva().cnpj);
+      return itens.find(it => 
+        it.id === decodedId || 
+        it.id === rawId || 
+        (it.oportunidade && (
+          it.oportunidade.id === decodedId || 
+          it.oportunidade.id === rawId ||
+          it.oportunidade.numeroControlePNCP === decodedId ||
+          it.oportunidade.numeroControlePNCP === rawId
+        ))
+      )?.oportunidade;
+    } catch {
+      return null;
+    }
+  })();
+
+  const localMatch = opFromState || kanbanMatch || mockOportunidades.find(op => 
     op.id === decodedId || 
     op.id === rawId || 
     (op.numeroControlePNCP && (op.numeroControlePNCP === decodedId || op.numeroControlePNCP === rawId))
