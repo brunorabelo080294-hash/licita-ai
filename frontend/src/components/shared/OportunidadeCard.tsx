@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Oportunidade, KanbanEtapa } from '../../types';
-import { Clock, MapPin, ChevronRight, ExternalLink, ShieldCheck, Heart, Columns3 } from 'lucide-react';
+import { 
+  Clock, MapPin, ChevronRight, ChevronDown, ChevronUp, 
+  ExternalLink, ShieldCheck, Heart, Columns3, Sparkles, 
+  FileText, Package, AlertCircle 
+} from 'lucide-react';
 import { BrasaoPrefeitura } from './BrasaoPrefeitura';
 import { calcularStatusPrazo, formatarUrlPncpWeb, resolverUrlOrigem } from '../../utils/pncpUrls';
 import { isOportunidadeFavorita, toggleFavoritoOportunidade } from '../../utils/favoritosStorage';
@@ -14,6 +18,7 @@ interface OportunidadeCardProps {
 
 export function OportunidadeCard({ oportunidade }: OportunidadeCardProps) {
   const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const getModalityInfo = (modalidade: Oportunidade['modalidade']) => {
     switch (modalidade) {
@@ -89,8 +94,11 @@ export function OportunidadeCard({ oportunidade }: OportunidadeCardProps) {
 
   return (
     <article 
-      onClick={() => navigate(`/edital/${encodeURIComponent(oportunidade.id)}`)}
-      className="bg-white rounded-2xl shadow-xs hover:shadow-md border border-slate-200/80 hover:border-[#01203C]/30 p-5 mb-4 cursor-pointer transition-all duration-200 active:scale-[0.99] group relative"
+      onClick={() => setIsExpanded(prev => !prev)}
+      className={`bg-white rounded-2xl shadow-xs hover:shadow-md border transition-all duration-200 p-5 mb-4 cursor-pointer group relative ${
+        isExpanded ? 'border-[#01203C]/40 ring-2 ring-[#01203C]/5' : 'border-slate-200/80 hover:border-[#01203C]/30'
+      }`}
+      title={isExpanded ? 'Clique para recolher detalhes' : 'Clique para ver mais informações desta licitação'}
     >
       {/* Topo: Município, Brasão, Distância e Badges de Status do Manual */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
@@ -169,15 +177,28 @@ export function OportunidadeCard({ oportunidade }: OportunidadeCardProps) {
           >
             <Heart size={16} className={isFav ? 'fill-rose-500 text-rose-500' : ''} />
           </button>
+
+          {/* Botão Indicador de Expandir/Recolher no Topo */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(prev => !prev);
+            }}
+            className="p-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-[#FB8B03] transition-all cursor-pointer flex items-center justify-center shrink-0"
+            title={isExpanded ? 'Recolher detalhes' : 'Abrir mais informações'}
+          >
+            {isExpanded ? <ChevronUp size={16} className="text-[#FB8B03]" /> : <ChevronDown size={16} />}
+          </button>
         </div>
       </div>
 
       {/* Título Oficial: Montserrat 700 (ex: Concorrência nº 025/2026) */}
       <h3 
-        className="text-sm font-bold text-[#01203C] mb-1.5"
+        className="text-sm font-bold text-[#01203C] mb-1.5 flex items-center justify-between gap-2"
         style={{ fontFamily: "'Montserrat', sans-serif" }}
       >
-        {oportunidade.numeroEdital || `${modInfo.label} • ${oportunidade.id.slice(0, 18)}`}
+        <span>{oportunidade.numeroEdital || `${modInfo.label} • ${oportunidade.id.slice(0, 18)}`}</span>
       </h3>
 
       {/* Objeto Resumido */}
@@ -222,6 +243,20 @@ export function OportunidadeCard({ oportunidade }: OportunidadeCardProps) {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {/* Botão de Expandir/Recolher Detalhes */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(prev => !prev);
+            }}
+            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95"
+            title={isExpanded ? 'Recolher detalhes' : 'Ver mais informações desta licitação'}
+          >
+            <span>{isExpanded ? 'Recolher' : 'Mais Informações'}</span>
+            {isExpanded ? <ChevronUp size={14} className="text-[#FB8B03]" /> : <ChevronDown size={14} />}
+          </button>
+
           {/* Botão Acompanhar no Kanban */}
           <button
             type="button"
@@ -252,28 +287,158 @@ export function OportunidadeCard({ oportunidade }: OportunidadeCardProps) {
 
           {/* Botão Primário do Manual: Quero Participar em Laranja Oficial */}
           <button
-            onClick={() => navigate(`/edital/${encodeURIComponent(oportunidade.id)}`)}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/edital/${encodeURIComponent(oportunidade.id)}`, { state: { oportunidade } });
+            }}
             className="px-4 py-2 bg-[#FB8B03] hover:bg-[#D97602] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer active:scale-95"
           >
             <span>Quero Participar</span>
             <ChevronRight size={14} />
           </button>
-
-          {/* Botão de Coração no Rodapé */}
-          <button
-            type="button"
-            onClick={handleToggleFav}
-            className={`p-2 rounded-xl border transition-all cursor-pointer active:scale-90 flex items-center justify-center shrink-0 ${
-              isFav 
-                ? 'bg-rose-50 border-rose-200 text-rose-500 shadow-2xs' 
-                : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-400 hover:text-rose-500'
-            }`}
-            title={isFav ? 'Favoritado! Acompanhando datas em SOS IA' : 'Favoritar licitação (Acompanhar datas em SOS IA)'}
-          >
-            <Heart size={16} className={isFav ? 'fill-rose-500 text-rose-500' : ''} />
-          </button>
         </div>
       </div>
+
+      {/* ======================================================== */}
+      {/* CAMPO DE MAIS INFORMAÇÕES (EXPANSÍVEL / ACCORDION)       */}
+      {/* ======================================================== */}
+      {isExpanded && (
+        <div 
+          onClick={(e) => e.stopPropagation()}
+          className="mt-4 pt-4 border-t border-slate-200/90 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200"
+        >
+          {/* Objeto Completo na Íntegra */}
+          <div className="bg-[#F7F8FA] p-4 rounded-2xl border border-slate-200/80">
+            <span className="text-[11px] font-black text-[#01203C] uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
+              <FileText size={14} className="text-[#FB8B03]" />
+              Descrição Completa do Objeto
+            </span>
+            <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-normal whitespace-pre-line">
+              {oportunidade.objetoOriginal || oportunidade.objetoResumido}
+            </p>
+          </div>
+
+          {/* Dados Detalhados do Certame */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-1.5">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Órgão & Localização
+              </span>
+              <p className="font-bold text-[#01203C] text-xs">
+                {oportunidade.orgao}
+              </p>
+              <p className="text-slate-600 flex items-center gap-1 text-[11px]">
+                <MapPin size={12} className="text-[#FB8B03]" />
+                {oportunidade.municipio.nome} - {oportunidade.municipio.uf}
+                {oportunidade.distanciaKm !== undefined && (
+                  <span className="text-slate-500 font-semibold">
+                    ({oportunidade.distanciaKm <= 0.5 ? 'Sua Cidade' : `${oportunidade.distanciaKm} km de distância`})
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs space-y-1.5">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Prazos & Envio de Propostas
+              </span>
+              <p className="font-bold text-[#01203C] text-xs flex items-center gap-1">
+                <Clock size={12} className="text-emerald-600" />
+                {statusInfo.textoPrazo}
+              </p>
+              <p className="text-slate-600 text-[11px]">
+                Encerramento: {oportunidade.dataEncerramento ? new Date(oportunidade.dataEncerramento).toLocaleString('pt-BR') : 'Consulte o Edital'}
+              </p>
+            </div>
+          </div>
+
+          {/* Exigências & Habilitação Rápida */}
+          <div className="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200/80 flex items-start gap-2.5 text-xs">
+            <ShieldCheck size={18} className="text-emerald-600 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-bold text-emerald-950 text-xs mb-0.5">
+                Exigências de Habilitação & CNDs
+              </h4>
+              <p className="text-emerald-800 text-[11px] leading-relaxed">
+                {oportunidade.exclusivoMpe 
+                  ? '🛡️ Licitação com participação exclusiva para MEI, Microempresa e EPP (Lei Complementar 123/2006).' 
+                  : 'Participação ampla aberta para todas as empresas credenciadas.'}
+                {' '}Exige regularidade fiscal com CND Federal/Previdenciária, FGTS e CND Trabalhista (CNDT).
+              </p>
+            </div>
+          </div>
+
+          {/* Itens do Edital (se disponíveis) */}
+          {oportunidade.itens && oportunidade.itens.length > 0 && (
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+              <div className="bg-slate-100 px-3.5 py-2.5 text-[11px] font-bold text-slate-700 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Package size={13} className="text-[#01203C]" />
+                  Itens Solicitados no Termo de Referência ({oportunidade.itens.length})
+                </span>
+                <span className="text-slate-500 font-normal">Valores Unitários Máximos</span>
+              </div>
+              <div className="divide-y divide-slate-100 max-h-48 overflow-y-auto">
+                {oportunidade.itens.slice(0, 10).map((it, idx) => (
+                  <div key={idx} className="p-2.5 text-xs flex items-center justify-between hover:bg-slate-50 gap-2">
+                    <span className="text-slate-700 font-medium truncate flex-1" title={it.descricao}>
+                      {idx + 1}. {it.descricao}
+                    </span>
+                    <span className="font-mono text-slate-500 shrink-0 text-[11px]">
+                      {it.quantidade} {it.unidade}
+                    </span>
+                    <span className="font-bold text-[#01203C] shrink-0 text-xs">
+                      {formatter.format(it.valorUnitarioMax)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Barra de Ações Rápidas do Campo Expandido */}
+          <div className="flex items-center justify-between gap-2.5 flex-wrap pt-1">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/edital/${encodeURIComponent(oportunidade.id)}`, { state: { oportunidade } });
+              }}
+              className="flex-1 min-w-[220px] py-2.5 px-4 bg-[#01203C] hover:bg-[#032F52] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <Sparkles size={14} className="text-[#FB8B03]" />
+              <span>Ver Análise Completa, Resumo IA & Calculadora</span>
+              <ChevronRight size={14} />
+            </button>
+
+            {pncpWebUrl && (
+              <a
+                href={pncpWebUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="py-2.5 px-4 bg-white hover:bg-slate-50 text-[#01203C] border border-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+              >
+                <span>Baixar no {oportunidade.portalNomeCurto || 'Portal Oficial'}</span>
+                <ExternalLink size={13} className="text-slate-400" />
+              </a>
+            )}
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(false);
+              }}
+              className="py-2.5 px-3 text-slate-500 hover:text-slate-800 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+            >
+              <ChevronUp size={14} />
+              <span>Recolher</span>
+            </button>
+          </div>
+        </div>
+      )}
     </article>
   );
 }

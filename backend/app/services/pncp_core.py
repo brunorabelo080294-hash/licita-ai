@@ -553,9 +553,12 @@ def detalhe_oportunidade_db(
     em vez de devolver a primeira licitação da lista quando o ID não bate.
     """
     inicializar_db()
+    import urllib.parse
+    id_decoded = urllib.parse.unquote(oportunidade_id)
     with _conexao_db() as conn:
         row = conn.execute(
-            "SELECT * FROM oportunidades WHERE id = ?", (oportunidade_id,)
+            "SELECT * FROM oportunidades WHERE id = ? OR numero_controle_pncp = ? OR id = ? OR numero_controle_pncp = ?", 
+            (oportunidade_id, oportunidade_id, id_decoded, id_decoded)
         ).fetchone()
     if not row:
         return None
