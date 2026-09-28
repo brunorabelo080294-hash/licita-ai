@@ -63,7 +63,7 @@ export function TopNavbar({ showLogo = true }: TopNavbarProps) {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FB8B03] animate-pulse"></span>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                  Radar Oficial PNCP • 11 Portais Integrados
+                  Radar Oficial de Compras Públicas
                 </span>
               </div>
             )}
